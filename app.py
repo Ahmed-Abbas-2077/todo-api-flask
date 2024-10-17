@@ -40,5 +40,30 @@ def getTodo(todo_id):
         abort(404, description="Todo not found")
 
 
+@app.route('/todos/<int:todo_id>', methods=['PUT'])
+def updateTodo(todo_id):
+    if todo_id >= len(todos):
+        abort(404, description="Todo not found")
+    if not request.json:
+        abort(400, description="Invalid input")
+
+    todo = todos[todo_id]
+    title = request.json.get('title', todo['title'])
+    description = request.json.get('description', todo['description'])
+    done = request.json.get('done', todo['done'])
+
+    # check data types
+    if not isinstance(title, str) or not isinstance(description, str) or not isinstance(done, bool):
+        abort(400, description="Invalid data types")
+
+    # update the todo
+    todo.update({
+        'title': title,
+        'description': description,
+        'done': done
+    })
+    return jsonify(todo), 200
+
+
 if __name__ == '__main__':
     app.run(debug=True)
