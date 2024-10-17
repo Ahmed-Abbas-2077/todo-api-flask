@@ -1,0 +1,172 @@
+openapi: 3.0.0
+info:
+  title: Todo List API
+  version: 1.0.0
+  description: A simple Todo List API built with Flask
+servers:
+  - url: http://localhost:5000
+paths:
+  /todos:
+    get:
+      summary: Retrieve all todos
+      responses:
+        '200':
+          description: A list of todos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Todo'
+    post:
+      summary: Create a new todo
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewTodo'
+      responses:
+        '201':
+          description: Todo created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Todo'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /todos/{id}:
+    get:
+      summary: Retrieve a todo by ID
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the todo to retrieve
+      responses:
+        '200':
+          description: A single todo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Todo'
+        '404':
+          description: Todo not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      summary: Update an existing todo
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the todo to update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTodo'
+      responses:
+        '200':
+          description: Todo updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Todo'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Todo not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      summary: Delete a todo
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the todo to delete
+      responses:
+        '200':
+          description: Todo deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: boolean
+        '404':
+          description: Todo not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    Todo:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: Buy groceries
+        description:
+          type: string
+          example: Milk, Bread, Eggs
+        done:
+          type: boolean
+          example: false
+    NewTodo:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+          example: Buy groceries
+        description:
+          type: string
+          example: Milk, Bread, Eggs
+    UpdateTodo:
+      type: object
+      properties:
+        title:
+          type: string
+          example: Buy groceries and fruits
+        description:
+          type: string
+          example: Milk, Bread, Eggs, and Fruits
+        done:
+          type: boolean
+          example: true
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          example: Not Found
+        message:
+          type: string
+          example: Todo not found
