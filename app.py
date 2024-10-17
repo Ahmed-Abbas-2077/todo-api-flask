@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request, abort
 
 app = Flask(__name__)
 
@@ -34,31 +34,28 @@ def createTodo():
 
 @app.route('/todos/<int:todo_id>', methods=['GET'])
 def getTodo(todo_id):
-    global todos
-    if todo_id < len(todos):
-        return jsonify(todos[todo_id]), 200
+    todo = next((item for item in todos if item['id'] == todo_id), None)
+    if todo:
+        return jsonify(todo), 200
     else:
         abort(404, description="Todo not found")
 
 
 @app.route('/todos/<int:todo_id>', methods=['PUT'])
 def updateTodo(todo_id):
-    global todos
-    if todo_id >= len(todos):
+    todo = next((item for item in todos if item['id'] == todo_id), None)
+    if not todo:
         abort(404, description="Todo not found")
     if not request.json:
         abort(400, description="Invalid input")
 
-    todo = todos[todo_id]
     title = request.json.get('title', todo['title'])
     description = request.json.get('description', todo['description'])
     done = request.json.get('done', todo['done'])
 
-    # check data types
     if not isinstance(title, str) or not isinstance(description, str) or not isinstance(done, bool):
         abort(400, description="Invalid data types")
 
-    # update the todo
     todo.update({
         'title': title,
         'description': description,
@@ -70,9 +67,9 @@ def updateTodo(todo_id):
 @app.route('/todos/<int:todo_id>', methods=['DELETE'])
 def deleteTodo(todo_id):
     global todos
-    if todo_id >= len(todos):
+    todo = next((item for item in todos if item['id'] == todo_id), None)
+    if not todo:
         abort(404, description="Todo not found")
-    todo = todos[todo_id]
     todos = [item for item in todos if item['id'] != todo_id]
     return jsonify({'result': True}), 200
 
