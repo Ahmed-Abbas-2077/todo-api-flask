@@ -34,6 +34,7 @@ def createTodo():
 
 @app.route('/todos/<int:todo_id>', methods=['GET'])
 def getTodo(todo_id):
+    global todos
     if todo_id < len(todos):
         return jsonify(todos[todo_id]), 200
     else:
@@ -42,6 +43,7 @@ def getTodo(todo_id):
 
 @app.route('/todos/<int:todo_id>', methods=['PUT'])
 def updateTodo(todo_id):
+    global todos
     if todo_id >= len(todos):
         abort(404, description="Todo not found")
     if not request.json:
@@ -63,6 +65,16 @@ def updateTodo(todo_id):
         'done': done
     })
     return jsonify(todo), 200
+
+
+@app.route('/todos/<int:todo_id>', methods=['DELETE'])
+def deleteTodo(todo_id):
+    global todos
+    if todo_id >= len(todos):
+        abort(404, description="Todo not found")
+    todo = todos[todo_id]
+    todos = [item for item in todos if item['id'] != todo_id]
+    return jsonify({'result': True}), 200
 
 
 if __name__ == '__main__':
