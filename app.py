@@ -77,5 +77,16 @@ def deleteTodo(todo_id):
     return jsonify({'result': True}), 200
 
 
+# Error handlers
+@app.errorhandler(400)
+def bad_request(error):
+    return jsonify({'error': 'Bad Request', 'message': error.description}), 400
+
+
+@app.errorhandler(404)
+def not_found(error):
+    return jsonify({'error': 'Not Found', 'message': error.description}), 404
+
+
 if __name__ == '__main__':
     app.run(debug=True)
